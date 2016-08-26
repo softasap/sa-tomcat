@@ -1,0 +1,28 @@
+---
+# defaults file for sa-tomcat
+
+  root_dir: "{{ role_path }}"
+  role_dir: "{{ role_path }}"
+
+  java_version: 8
+  option_install_java: false
+
+  tomcat_users: []
+  tomcat_port: 8080
+  tomcat_control_port: 8005
+
+  tomcat_java_opts: -Djava.awt.headless=true -Xmx2048m -XX:+UseConcMarkSweepGC
+  tomcat_catalina_opts:
+
+  tomcat_global_naming_resources:
+  tomcat_jvm_route:
+
+
+  option_tomcat_admin_install: true
+  option_tomcat_user_install: true
+  option_tomcat_native_install: true
+
+
+  option_tomcat_mysql_jbdc_install: false
+  option_tomcat_postgresql_jbdc_install: false
+  tomcat_postgresql_jdbc_version: 9.4.1208

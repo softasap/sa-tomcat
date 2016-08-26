@@ -1,0 +1,97 @@
+---
+
+  - name: Tomcat | Install Tomcat packages
+    apt: pkg="{{item}}"
+    become: yes
+    with_items:
+      - libssl1.0.0
+      - libecj-java
+      - libtomcat8-java
+      - tomcat8-common
+      - tomcat8
+
+  - name: Tomcat | Install Tomcat Admin package
+    apt: tomcat8-admin
+    become: yes
+    when: option_tomcat_admin_install
+
+  - name: Tomcat | Install Tomcat User package
+    apt: pkg="tomcat8-user"
+    become: yes
+    when: option_tomcat_user_install
+
+  - name: Tomcat | Install Tomcat Native Library packages
+    apt: pkg="{{item}}"
+    become: yes
+    with_items:
+      - libapr1
+      - libtcnative-1
+    when: tomcat_native_install
+
+  # see https://bugs.launchpad.net/ubuntu/+source/tomcat-native/+bug/1326255 for details
+  - name: Tomcat | Fix Tomcat Native Library Ubuntu packaging bug
+    file:  path=/usr/lib/libtcnative-1.so src=/usr/lib/x86_64-linux-gnu/libtcnative-1.so state=link
+    become: yes
+    when: option_tomcat_native_install
+
+  - name: Tomcat | Enable Tomcat system user to re-deploy to root context (/)
+    file: path=/var/lib/tomcat8/webapps/ROOT  state=directory owner=tomcat8  group=tomcat8
+    become: yes
+
+
+  - name: Tomcat | Update Tomcat's server.xml
+    template: src="{{role_dir}}/templates/server.xml.j2" dest=/var/lib/tomcat8/conf/server.xml
+    become: yes
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Update Tomcat's tomcat-users.xml
+    template:  src="{{role_dir}}/templates/tomcat-users.xml.j2"  dest: /var/lib/tomcat8/conf/tomcat-users.xml
+    become: yes
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Set Tomcat's JAVA_OPTS
+    lineinfile:
+      dest: /etc/default/tomcat8
+      state: present
+      regexp: '^JAVA_OPTS=.*$'
+      line: 'JAVA_OPTS="{{ tomcat_java_opts }}"'
+    become: yes
+    when: tomcat_java_opts is defined
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Set Tomcat's CATALINA_OPTS
+    lineinfile:
+      dest: /etc/default/tomcat8
+      state: present
+      regexp: '^CATALINA_OPTS=.*$'
+      line: 'CATALINA_OPTS="{{ tomcat_catalina_opts }}"'
+      insertafter: '^JAVA_OPTS=.*$'
+    become: yes
+    when: tomcat_catalina_opts is defined
+    notify:
+      - restart tomcat
+
+
+  - name: Tomcat | Download MySQL JBDC Driver
+    apt:  name=libmysql-java
+    when: option_tomcat_mysql_jbdc_install
+    become: yes
+
+  - name: Tomcat | Enable MySQL JBDC Driver
+    file: path=/usr/share/tomcat8/lib/mysql-connector-java.jar src=/usr/share/java/mysql-connector-java.jar  state=link
+    when: option_tomcat_mysql_jbdc_install
+    become: yes
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Download PostgreSQL JBDC Driver
+    get_url:
+      url: http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/{{ tomcat_postgresql_jdbc_version }}/postgresql-{{ tomcat_postgresql_jdbc_version }}.jar
+      dest: /usr/share/tomcat8/lib/
+    become: yes
+    when: option_tomcat_postgresql_jbdc_install
+    notify:
+      - restart tomcat

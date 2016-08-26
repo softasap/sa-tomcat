@@ -1,0 +1,4 @@
+[submodule "roles/sa-tomcat"]
+        path = roles/sa-tomcat
+        url = https://github.com/softasap/sa-tomcat.git
+
