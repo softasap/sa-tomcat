@@ -12,6 +12,11 @@
   tomcat_port: 8080
   tomcat_control_port: 8005
 
+  tomcat_catalina_home: "/usr/share/tomcat{{tomcat_version}}"
+  tomcat_catalina_base: "/var/lib/tomcat{{tomcat_version}}"
+
+
+
   tomcat_java_opts: -Djava.awt.headless=true -Xmx2048m -XX:+UseConcMarkSweepGC
   tomcat_catalina_opts:
 

@@ -4,4 +4,4 @@
 - name: restart tomcat
   service: name="tomcat{{tomcat_version}}" state=restarted  enabled=yes
   become: yes
-  when: docker_test is not defined.
+  when: docker_test is not defined

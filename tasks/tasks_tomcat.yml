@@ -93,23 +93,23 @@
     notify:
       - restart tomcat
 
-  - name: Tomcat | Patch CATALINA_HOME
+  - name: Tomcat | Patch CATALINA_HOME (/etc/default)
     lineinfile:
       dest: "/etc/default/tomcat{{tomcat_version}}"
       state: present
       regexp: '^CATALINA_HOME=.*$'
-      line: 'CATALINA_HOME=/usr/share/tomcat{{tomcat_version}}'
+      line: 'CATALINA_HOME={{tomcat_catalina_home}}'
       insertafter: '^#JAVA_HOME=.*$'
     become: yes
     notify:
       - restart tomcat
 
-  - name: Tomcat | Patch CATALINA_HOME
+  - name: Tomcat | Patch CATALINA_BASE (/etc/default)
     lineinfile:
       dest: "/etc/default/tomcat{{tomcat_version}}"
       state: present
       regexp: '^CATALINA_BASE=.*$'
-      line: 'CATALINA_BASE=/var/lib/tomcat{{tomcat_version}}'
+      line: 'CATALINA_BASE={{tomcat_catalina_base}}'
       insertafter: '^#JAVA_HOME=.*$'
     become: yes
     notify:
@@ -121,7 +121,7 @@
     become: yes
 
   - name: Tomcat | Enable MySQL JBDC Driver
-    file: path="/usr/share/tomcat{{tomcat_version}}/lib/mysql-connector-java.jar" src=/usr/share/java/mysql-connector-java.jar  state=link
+    file: path="{{tomcat_catalina_base}}/mysql-connector-java.jar" src=/usr/share/java/mysql-connector-java.jar  state=link
     when: option_tomcat_mysql_jbdc_install
     become: yes
     notify:
@@ -130,7 +130,7 @@
   - name: Tomcat | Download PostgreSQL JBDC Driver
     get_url:
       url: http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/{{ tomcat_postgresql_jdbc_version }}/postgresql-{{ tomcat_postgresql_jdbc_version }}.jar
-      dest: "/usr/share/tomcat{{tomcat_version}}/lib/"
+      dest: "{{tomcat_catalina_base}}"
     become: yes
     when: option_tomcat_postgresql_jbdc_install
     notify:
