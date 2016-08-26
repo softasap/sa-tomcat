@@ -133,6 +133,12 @@
     notify:
       - restart tomcat
 
+  - name: Tomcat | Hakish lns
+    file: path="{{tomcat_catalina_home}}/conf" src="{{tomcat_catalina_base}}/conf"  state=link
+    become: yes
+    notify:
+      - restart tomcat
+
 
   - name: Tomcat | Download MySQL JBDC Driver
     apt:  name=libmysql-java
