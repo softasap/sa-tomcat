@@ -93,7 +93,27 @@
     notify:
       - restart tomcat
 
+  - name: Tomcat | Patch CATALINA_HOME
+    lineinfile:
+      dest: "/etc/default/tomcat{{tomcat_version}}"
+      state: present
+      regexp: '^CATALINA_HOME=.*$'
+      line: 'CATALINA_HOME=/usr/share/tomcat{{tomcat_version}}'
+      insertafter: '^#JAVA_HOME=.*$'
+    become: yes
+    notify:
+      - restart tomcat
 
+  - name: Tomcat | Patch CATALINA_HOME
+    lineinfile:
+      dest: "/etc/default/tomcat{{tomcat_version}}"
+      state: present
+      regexp: '^CATALINA_BASE=.*$'
+      line: 'CATALINA_BASE=/var/lib/tomcat{{tomcat_version}}'
+      insertafter: '^#JAVA_HOME=.*$'
+    become: yes
+    notify:
+      - restart tomcat
 
   - name: Tomcat | Download MySQL JBDC Driver
     apt:  name=libmysql-java
