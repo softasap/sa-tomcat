@@ -20,7 +20,9 @@
      Documentation at /docs/config/server.html
  -->
 <Server port="{{ tomcat_control_port }}" shutdown="SHUTDOWN">
+  {% if tomcat_version == 8 %}
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  {% endif %}  
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
