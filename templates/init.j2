@@ -27,7 +27,7 @@ PATH=/bin:/usr/bin:/sbin:/usr/sbin
 NAME={{ user_instance.name }}
 DESC="Tomcat servlet engine for user instance {{ user_instance.name }}"
 DEFAULT=/etc/default/$NAME
-JVM_TMP=/tmp/tomcat8-$NAME-tmp
+JVM_TMP=/tmp/tomcat{{tomcat_version}}-$NAME-tmp
 
 if [ `id -u` -ne 0 ]; then
 	echo "You need root privileges to run this script"
@@ -50,8 +50,8 @@ fi
 # The following variables can be overwritten in $DEFAULT
 
 # Run Tomcat 8 as this user ID and group ID
-TOMCAT8_USER=tomcat8
-TOMCAT8_GROUP=tomcat8
+TOMCAT8_USER=tomcat{{tomcat_version}}
+TOMCAT8_GROUP=tomcat{{tomcat_version}}
 
 # this is a work-around until there is a suitable runtime replacement
 # for dpkg-architecture for arch:all packages

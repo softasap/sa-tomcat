@@ -1,5 +1,13 @@
 ---
 
+  - name: Tomcat | Detect java home
+    shell: "jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty(\"java.home\"));'"
+    register: auto_java_home
+
+  - set_fact:
+      tomcat_java_home: "{{auto_java_home.stdout}}"
+    when: tomcat_java_home is not defined
+
   - name: Tomcat | Install Tomcat packages
     apt: pkg="{{item}}"
     become: yes
@@ -73,6 +81,18 @@
     when: tomcat_catalina_opts is defined
     notify:
       - restart tomcat
+
+  - name: Tomcat | Patch java home
+    lineinfile:
+      dest: "/etc/default/tomcat{{tomcat_version}}"
+      state: present
+      regexp: '^JAVA_HOME=.*$'
+      line: 'JAVA_HOME={{tomcat_java_home}}'
+      insertafter: '^#JAVA_HOME=.*$'
+    become: yes
+    notify:
+      - restart tomcat
+
 
 
   - name: Tomcat | Download MySQL JBDC Driver
