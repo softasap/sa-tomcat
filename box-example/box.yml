@@ -3,7 +3,12 @@
 
   vars:
     - root_dir: ..
-
+    - my_tomcat_users:
+      - {
+         name: admin,
+         password: admin,
+         roles: "admin,admin-gui,manager-gui"
+        }
 
   pre_tasks:
     - debug: msg="Pre tasks section"
@@ -12,7 +17,7 @@
      - {
          role: "sa-tomcat",
          option_install_java: true,
-         tomcat_version: 7 
+         tomcat_version: 7
        }
 
 
