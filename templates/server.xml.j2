@@ -35,7 +35,9 @@
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  {% if tomcat_version == 8 %}
   <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+  {% endif %}
 
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html

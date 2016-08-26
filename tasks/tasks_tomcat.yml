@@ -115,6 +115,25 @@
     notify:
       - restart tomcat
 
+  - name: Tomcat | Hakish lns
+    file: path="{{tomcat_catalina_home}}/common" src="{{tomcat_catalina_base}}/common"  state=link
+    become: yes
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Hakish lns
+    file: path="{{tomcat_catalina_home}}/server" src="{{tomcat_catalina_base}}/server"  state=link
+    become: yes
+    notify:
+      - restart tomcat
+
+  - name: Tomcat | Hakish lns
+    file: path="{{tomcat_catalina_home}}/shared" src="{{tomcat_catalina_base}}/shared"  state=link
+    become: yes
+    notify:
+      - restart tomcat
+
+
   - name: Tomcat | Download MySQL JBDC Driver
     apt:  name=libmysql-java
     when: option_tomcat_mysql_jbdc_install
