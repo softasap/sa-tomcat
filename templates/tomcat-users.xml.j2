@@ -25,11 +25,6 @@
   you must define such a user - the username and password are arbitrary.
 -->
 
-<role rolename="admin"/>
-<role rolename="admin-gui"/>
-<role rolename="manager-gui"/>
-
-
 {% for user in tomcat_users %}
   <user username="{{ user.name }}" password="{{ user.password }}" roles="{{ user.roles }}"/>
 {% endfor %}

@@ -29,8 +29,6 @@ galaxy_info:
     - tomcat
     - java
     - ubuntu
-  dependencies:
-  - role: Voronenko.developer_recipe
   #platforms:
   #- name: EL
   #  versions:

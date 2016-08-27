@@ -50,6 +50,7 @@
   - name: Tomcat | Update Tomcat's server.xml
     template: src="{{role_dir}}/templates/server.xml.j2" dest="/var/lib/tomcat{{tomcat_version}}/conf/server.xml"
     become: yes
+    when: tomcat_version == 8
     notify:
       - restart tomcat
 
