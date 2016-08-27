@@ -117,12 +117,14 @@
 
   - name: Tomcat | Hakish lns
     file: path="{{tomcat_catalina_home}}/common" src="{{tomcat_catalina_base}}/common"  state=link
+    when: tomcat_version == 7
     become: yes
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
     file: path="{{tomcat_catalina_home}}/server" src="{{tomcat_catalina_base}}/server"  state=link
+    when: tomcat_version == 7
     become: yes
     notify:
       - restart tomcat
@@ -130,12 +132,14 @@
   - name: Tomcat | Hakish lns
     file: path="{{tomcat_catalina_home}}/shared" src="{{tomcat_catalina_base}}/shared"  state=link
     become: yes
+    when: tomcat_version == 7
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
     file: path="{{tomcat_catalina_home}}/conf" src="{{tomcat_catalina_base}}/conf"  state=link
     become: yes
+    when: tomcat_version == 7
     notify:
       - restart tomcat
 
