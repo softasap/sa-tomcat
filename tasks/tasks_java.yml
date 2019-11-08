@@ -44,6 +44,7 @@
           set_fact:
             java_package: "openjdk-11-jdk"
             java_version: 11
+            tomcat_version: 9
           when: ansible_distribution_version.split('.')[0] in ['18']
 
       when: ansible_os_family == 'Debian' and ansible_distribution == 'Ubuntu'
