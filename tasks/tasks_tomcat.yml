@@ -10,6 +10,11 @@
       tomcat_java_home: "{{ auto_java_home.stdout }}"
     when: tomcat_java_home is not defined
 
+  - name: Override version facts
+    set_fact:
+       tomcat_user: "tomcat"
+    when: tomcat_version in [ "9", 9 ]
+
   - name: Tomcat | Install Tomcat packages
     apt:
      pkg:
@@ -49,8 +54,8 @@
     file:
       path: "/var/lib/tomcat{{ tomcat_version }}/webapps/ROOT"
       state: directory
-      owner: "tomcat{{ tomcat_version }}"
-      group: "tomcat{{ tomcat_version }}"
+      owner: "{{ tomcat_user }}"
+      group: "{{ tomcat_user }}"
     become: yes
 
 

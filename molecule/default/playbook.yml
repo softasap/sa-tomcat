@@ -12,5 +12,6 @@
 
   roles:
      - {
-        role: "sa-tomcat"
+        role: "sa-tomcat",
+        option_install_java: true
        }
