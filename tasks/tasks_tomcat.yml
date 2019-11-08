@@ -2,38 +2,41 @@
 
   - name: Tomcat | Detect java home
     shell: "jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty(\"java.home\"));'"
+    changed_when: False
     register: auto_java_home
 
-  - set_fact:
-      tomcat_java_home: "{{auto_java_home.stdout}}"
+  - name: Detect tomcat java home
+    set_fact:
+      tomcat_java_home: "{{ auto_java_home.stdout }}"
     when: tomcat_java_home is not defined
 
   - name: Tomcat | Install Tomcat packages
-    apt: pkg="{{item}}"
-    become: yes
-    with_items:
+    apt:
+     pkg:
       - libssl1.0.0
       - libecj-java
-      - "libtomcat{{tomcat_version}}-java"
-      - "tomcat{{tomcat_version}}-common"
-      - "tomcat{{tomcat_version}}"
+      - "libtomcat{{ tomcat_version }}-java"
+      - "tomcat{{ tomcat_version }}-common"
+      - "tomcat{{ tomcat_version }}"
+    become: yes
 
   - name: Tomcat | Install Tomcat Admin package
-    apt: pkg="tomcat{{tomcat_version}}-admin"
+    apt: pkg="tomcat{{ tomcat_version }}-admin"
     become: yes
     when: option_tomcat_admin_install
 
   - name: Tomcat | Install Tomcat User package
-    apt: pkg="tomcat{{tomcat_version}}-user"
+    apt: pkg="tomcat{{ tomcat_version }}-user"
     become: yes
     when: option_tomcat_user_install
 
   - name: Tomcat | Install Tomcat Native Library packages
-    apt: pkg="{{item}}"
+    apt:
+      pkg:
+        - libapr1
+        - libtcnative-1
     become: yes
-    with_items:
-      - libapr1
-      - libtcnative-1
+
     when: option_tomcat_native_install
 
   # see https://bugs.launchpad.net/ubuntu/+source/tomcat-native/+bug/1326255 for details
@@ -43,26 +46,34 @@
     when: option_tomcat_native_install
 
   - name: Tomcat | Enable Tomcat system user to re-deploy to root context (/)
-    file: path="/var/lib/tomcat{{tomcat_version}}/webapps/ROOT"  state=directory owner="tomcat{{tomcat_version}}"  group="tomcat{{tomcat_version}}"
+    file:
+      path: "/var/lib/tomcat{{ tomcat_version }}/webapps/ROOT"
+      state: directory
+      owner: "tomcat{{ tomcat_version }}"
+      group: "tomcat{{ tomcat_version }}"
     become: yes
 
 
   - name: Tomcat | Update Tomcat's server.xml
-    template: src="{{role_dir}}/templates/server.xml.j2" dest="/var/lib/tomcat{{tomcat_version}}/conf/server.xml"
+    template:
+      src: "{{ role_dir }}/templates/server.xml.j2"
+      dest: "/var/lib/tomcat{{ tomcat_version }}/conf/server.xml"
     become: yes
     when: tomcat_version == 8
     notify:
       - restart tomcat
 
   - name: Tomcat | Update Tomcat's tomcat-users.xml
-    template:  src="{{role_dir}}/templates/tomcat-users.xml.j2"  dest=/var/lib/tomcat{{tomcat_version}}/conf/tomcat-users.xml
+    template:
+       src: "{{ role_dir }}/templates/tomcat-users.xml.j2"
+       dest: "/var/lib/tomcat{{ tomcat_version }}/conf/tomcat-users.xml"
     become: yes
     notify:
       - restart tomcat
 
   - name: Tomcat | Set Tomcat's JAVA_OPTS
     lineinfile:
-      dest: "/etc/default/tomcat{{tomcat_version}}"
+      dest: "/etc/default/tomcat{{ tomcat_version }}"
       state: present
       regexp: '^JAVA_OPTS=.*$'
       line: 'JAVA_OPTS="{{ tomcat_java_opts }}"'
@@ -73,7 +84,7 @@
 
   - name: Tomcat | Set Tomcat's CATALINA_OPTS
     lineinfile:
-      dest: "/etc/default/tomcat{{tomcat_version}}"
+      dest: "/etc/default/tomcat{{ tomcat_version }}"
       state: present
       regexp: '^CATALINA_OPTS=.*$'
       line: 'CATALINA_OPTS="{{ tomcat_catalina_opts }}"'
@@ -85,10 +96,10 @@
 
   - name: Tomcat | Patch java home
     lineinfile:
-      dest: "/etc/default/tomcat{{tomcat_version}}"
+      dest: "/etc/default/tomcat{{ tomcat_version }}"
       state: present
       regexp: '^JAVA_HOME=.*$'
-      line: 'JAVA_HOME={{tomcat_java_home}}'
+      line: 'JAVA_HOME={{ tomcat_java_home }}'
       insertafter: '^#JAVA_HOME=.*$'
     become: yes
     notify:
@@ -96,10 +107,10 @@
 
   - name: Tomcat | Patch CATALINA_HOME (/etc/default)
     lineinfile:
-      dest: "/etc/default/tomcat{{tomcat_version}}"
+      dest: "/etc/default/tomcat{{ tomcat_version }}"
       state: present
       regexp: '^CATALINA_HOME=.*$'
-      line: 'CATALINA_HOME={{tomcat_catalina_home}}'
+      line: 'CATALINA_HOME={{ tomcat_catalina_home }}'
       insertafter: '^#JAVA_HOME=.*$'
     become: yes
     notify:
@@ -107,38 +118,38 @@
 
   - name: Tomcat | Patch CATALINA_BASE (/etc/default)
     lineinfile:
-      dest: "/etc/default/tomcat{{tomcat_version}}"
+      dest: "/etc/default/tomcat{{ tomcat_version }}"
       state: present
       regexp: '^CATALINA_BASE=.*$'
-      line: 'CATALINA_BASE={{tomcat_catalina_base}}'
+      line: 'CATALINA_BASE={{ tomcat_catalina_base }}'
       insertafter: '^#JAVA_HOME=.*$'
     become: yes
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
-    file: path="{{tomcat_catalina_home}}/common" src="{{tomcat_catalina_base}}/common"  state=link
+    file: path="{{ tomcat_catalina_home }}/common" src="{{ tomcat_catalina_base }}/common"  state=link
     when: tomcat_version == 7
     become: yes
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
-    file: path="{{tomcat_catalina_home}}/server" src="{{tomcat_catalina_base}}/server"  state=link
+    file: path="{{ tomcat_catalina_home }}/server" src="{{ tomcat_catalina_base }}/server"  state=link
     when: tomcat_version == 7
     become: yes
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
-    file: path="{{tomcat_catalina_home}}/shared" src="{{tomcat_catalina_base}}/shared"  state=link
+    file: path="{{ tomcat_catalina_home }}/shared" src="{{ tomcat_catalina_base }}/shared"  state=link
     become: yes
     when: tomcat_version == 7
     notify:
       - restart tomcat
 
   - name: Tomcat | Hakish lns
-    file: path="{{tomcat_catalina_home}}/conf" src="{{tomcat_catalina_base}}/conf"  state=link
+    file: path="{{ tomcat_catalina_home }}/conf" src="{{ tomcat_catalina_base }}/conf"  state=link
     become: yes
     when: tomcat_version == 7
     notify:
@@ -151,7 +162,7 @@
     become: yes
 
   - name: Tomcat | Enable MySQL JBDC Driver
-    file: path="{{tomcat_catalina_base}}/mysql-connector-java.jar" src=/usr/share/java/mysql-connector-java.jar  state=link
+    file: path="{{ tomcat_catalina_base }}/mysql-connector-java.jar" src=/usr/share/java/mysql-connector-java.jar  state=link
     when: option_tomcat_mysql_jbdc_install
     become: yes
     notify:
@@ -160,7 +171,7 @@
   - name: Tomcat | Download PostgreSQL JBDC Driver
     get_url:
       url: http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/{{ tomcat_postgresql_jdbc_version }}/postgresql-{{ tomcat_postgresql_jdbc_version }}.jar
-      dest: "{{tomcat_catalina_base}}"
+      dest: "{{ tomcat_catalina_base }}"
     become: yes
     when: option_tomcat_postgresql_jbdc_install
     notify:
